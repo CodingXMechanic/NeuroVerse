@@ -1,0 +1,77 @@
+{
+  "entities": {
+    "User": {
+      "title": "User",
+      "description": "A user of the NeuroVerse application.",
+      "type": "object",
+      "properties": {
+        "uid": { "type": "string", "description": "Firebase Auth UID" },
+        "email": { "type": "string", "format": "email" },
+        "displayName": { "type": "string" },
+        "photoURL": { "type": "string" },
+        "createdAt": { "type": "string", "format": "date-time" },
+        "role": { "type": "string", "enum": ["user", "admin"] }
+      },
+      "required": ["uid", "email", "createdAt", "role"]
+    },
+    "Memory": {
+      "title": "Memory",
+      "description": "A user's memory, including its AI-processed reconstruction and biases.",
+      "type": "object",
+      "properties": {
+        "userId": { "type": "string", "description": "The UID of the user who owns this memory." },
+        "title": { "type": "string" },
+        "rawText": { "type": "string" },
+        "emotion": { "type": "string" },
+        "createdAt": { "type": "string", "format": "date-time" },
+        "status": { "type": "string", "enum": ["pending", "processed", "error"] },
+        "reconstruction": {
+          "type": "object",
+          "properties": {
+            "objectiveFacts": { "type": "array", "items": { "type": "string" } },
+            "subjectiveInterpretations": { "type": "array", "items": { "type": "string" } },
+            "narrative": { "type": "string" },
+            "timeline": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "time": { "type": "string" },
+                  "event": { "type": "string" }
+                }
+              }
+            }
+          }
+        },
+        "biases": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "type": { "type": "string" },
+              "description": { "type": "string" },
+              "quote": { "type": "string" },
+              "severity": { "type": "number" },
+              "confidenceScore": { "type": "number" }
+            }
+          }
+        },
+        "simulation": {
+          "type": "string",
+          "description": "JSON stringified object containing perspectives, nodes, and post-simulation analysis."
+        }
+      },
+      "required": ["userId", "title", "rawText", "emotion", "createdAt", "status"]
+    }
+  },
+  "firestore": {
+    "/users/{userId}": {
+      "schema": { "$ref": "#/entities/User" },
+      "description": "Stores user profiles."
+    },
+    "/memories/{memoryId}": {
+      "schema": { "$ref": "#/entities/Memory" },
+      "description": "Stores user memories and their AI analysis."
+    }
+  }
+}
